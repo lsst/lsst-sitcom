@@ -1,4 +1,3 @@
 setupRequired(lsst_distrib)
 setupRequired(summit_utils)
 setupRequired(summit_extras)
-setupRequired(rubintv_production)
