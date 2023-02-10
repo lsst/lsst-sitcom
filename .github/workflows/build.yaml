@@ -1,0 +1,41 @@
+name: Build LSST Stack
+on:
+  workflow_dispatch:
+    inputs:
+      refs:
+        description: 'List of refs to build; do not specify main'
+        required: false
+        type: string
+        default: ''
+      products:
+        description: 'List of products to build'
+        required: true
+        type: string
+        default: 'lsst_distrib lsst_ci'
+      condaEnv:
+        description: 'Version of rubin-env conda environment'
+        required: true
+        type: string
+        default: '5.1.0'
+
+jobs:
+  lsstsw-build:
+    name: Build stack
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone lsstsw
+        run: git clone https://github.com/lsst/lsstsw
+      - name: Deploy lsstsw
+        run: |
+          cd lsstsw
+          LSST_SPLENV_REF="${{ inputs.condaEnv }}" bin/deploy
+      - name: Build
+        run: |
+          refs=()
+          if [ -n "${{ input.refs }}" ]; then
+            for r in ${{ input.refs }}; do
+              refs+="-r $r"
+            done
+          fi
+          cd lsstsw
+          bin/rebuild "${refs[@]}" ${{ input.products }}
